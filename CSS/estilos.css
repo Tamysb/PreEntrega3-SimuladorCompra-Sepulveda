@@ -8,7 +8,7 @@ header{
     background-color: plum;
     text-align: center;
 }
-.producto{
+#productos{
     background-color: pink;
     color: plum;
     text-transform: uppercase;

@@ -1,60 +1,113 @@
-// Calculo Precio con Iva
+// Productos
 
 class Producto{
-    constructor(nombre, cantidad, precio){
+    constructor(id,nombre, cantidad, precio){
+    this.id=id
     this.nombre = nombre
     this.cantidad = cantidad
     this.precio = precio
     this.precioConIVA = function(){
         let precioIVA = this.precio * 1.9;
-        return "$" + precioIVA+  " " + "iva"
-    }
-    this.precioConDescuento = function(){
-        let precioConDescuento = this.precio * 1.9
-        if(precioConDescuento >= 9000){
-            return "$" + (precioConDescuento-(precioConDescuento * 0.20)) +  " " + "20% descuento"
-        }
-        else{
-            return "$" + precioConDescuento + " " +"Sin descuento"
-        }
+        return precioIVA
     }
 }
 }
 const productos=[
-    new Producto("producto1", 1, 5000),
-    new Producto("producto2", 1, 6000),
-    new Producto("producto3", 1, 10000),
-    new Producto("producto4", 1, 2000)
+    new Producto(1,"producto1", 1, 5000),
+    new Producto(2,"producto2", 1, 6000),
+    new Producto(3,"producto3", 1, 10000),
+    new Producto(4,"producto4", 1, 2000),
+    new Producto(5,"producto5",1,3000)
 ]
-//Agregar un producto nuevo
-productos.push(new Producto("producto5", 1, 2000))
 
-for(const Producto of productos){
-    console.log(Producto.precioConIVA())
-    console.log(Producto.precioConDescuento())
+// Carro de Compras
+const contenedorProductos = document.getElementById('productos');
+const contenedorElementosCarrito = document.getElementById('elementos-carrito');
+const totalSpan = document.getElementById('total');
+const desc = document.getElementById('descuento')
+
+function renderizarProductos(){
+    productos.forEach(producto =>{
+        const div = document.createElement('div');
+        div.classList.add('producto');
+        div.innerHTML = `
+        <h3>${producto.nombre}</h3>
+        <p>$${producto.precio}</p>
+        <p>$${producto.precioConIVA()} iva</p>
+        <button class="btn-agregar-carrito" data-id="${producto.id}">comprar</button> 
+        `;
+        contenedorProductos.appendChild(div);
+        
+    })
 }
 
-//lista productos con IVA y descuennto
-productos.forEach
-((producto)=>console.log(producto.nombre,producto.precioConIVA(),producto.precioConDescuento()))
+//agregar al carrito el producto
 
-// filtrar producto
-const filtro1 = productos.filter(item=>item.precio <= 3000)
-console.log(filtro1)
+function agregarAlCarrito(idProducto){
+    const elementosCarrito = JSON.parse(localStorage.getItem('carro'))||[];
+    const itemExistente = elementosCarrito.find(item => item.id === idProducto);
+    if(itemExistente){
+        itemExistente.cantidad++
+    }else{
+        const producto = productos.find(p => p.id === idProducto);
+        if(producto){
+            elementosCarrito.push({...producto, cantidad:1});
 
-//Busqueda
-const resultado= productos.find((productos)=> productos.precio <=5000)
-console.log(resultado)
-
-//Sumar carrito de compras
-const precioTotal = productos.reduce(function(acumulador,producto){
-    return acumulador + (producto.precio * 1.9)
-}, 0)
-console.log("$" + precioTotal);
-
-// Calcular el precio  en cuanto a la cantidad de productos
-let NUMERO = parseInt(prompt("Calcular precio x cantidad. Ingrese precio iva"))
-for(let i=0; i<10; i++){
-    let RESULTADO = NUMERO * i
-    console.log(NUMERO + "x" + i + "=" + RESULTADO)
+        }
+    }
+    localStorage.setItem('carro', JSON.stringify(elementosCarrito))
+    renderizarCarrito();
 }
+
+//eliminar el producto
+
+function eliminarDelCarrito(idProducto){
+    const elementosCarrito = JSON.parse(localStorage.getItem('carro'))||[];
+    const indice = elementosCarrito.findIndex(item => item.id === idProducto);
+    if(indice !== -1){
+        elementosCarrito.splice(indice, 1);
+    }
+    localStorage.setItem('carro', JSON.stringify(elementosCarrito))
+    renderizarCarrito()
+}
+
+function renderizarCarrito() {
+    const elementosCarrito = JSON.parse(localStorage.getItem('carro'))||[];
+    contenedorElementosCarrito.innerHTML = '';
+    let precioTotal = 0;
+    elementosCarrito.forEach(item =>{
+            const li = document.createElement('li');
+            li.textContent = `${item.nombre} x ${item.cantidad}  - $${item.precio * item.cantidad}-$${(item.precio*1.9)*item.cantidad}`
+            const btnEliminar = document.createElement('button');
+            btnEliminar.textContent = 'eliminar';
+            btnEliminar.addEventListener('click', () => eliminarDelCarrito(item.id))
+            li.appendChild(btnEliminar);
+            contenedorElementosCarrito.appendChild(li);
+            precioTotal += (item.precio * 1.9) * item.cantidad
+    })
+    totalSpan.textContent = precioTotal;
+    localStorage.setItem('carro', JSON.stringify(elementosCarrito))
+}
+
+function realizarCompra(){
+    const elementosCarrito = JSON.parse(localStorage.getItem('carro'))||[];
+    alert(`compra exitosa $${totalSpan.textContent}`);
+    elementosCarrito.length = 0;
+    localStorage.setItem('carro', JSON.stringify(elementosCarrito))
+    renderizarCarrito();
+}
+
+document.getElementById('btn-comprar').addEventListener('click',realizarCompra);
+contenedorProductos.addEventListener('click',function(evento){
+    if(evento.target.classList.contains('btn-agregar-carrito')){
+            const idProducto = parseInt(evento.target.getAttribute('data-id'));
+            agregarAlCarrito(idProducto);
+        }
+    
+});
+
+
+window.addEventListener('load',()=> {
+    renderizarProductos(),
+    renderizarCarrito()
+})

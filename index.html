@@ -13,30 +13,18 @@
         </div>
     </header>
     <section class="producto">
-        <div>
-            <h2>producto1</h2>
-            <p>cantidad</p>
-            <input type="submit" value="añadir" >
-        </div>
-        <div>
-            <h2>producto2</h2>
-            <p>cantidad</p>
-            <input type="submit" value="añadir" >
-        </div>
-        <div>
-            <h2>producto3</h2>
-            <p>cantidad</p>
-            <input type="submit" value="añadir" >
-        </div>
+        <div id="productos"></div>
     </section>
-    <section class="carro">
-        <h2>carro</h2>
-        <div class="carroProductos">
-        </div>
-        <div class="carroTotal">
-            <p>iva:</p>
-            <p>descuento :</p>
-            <h3>total:</h3>
+    <section>
+        <div class="carro">
+            <h1>carro de compras</h1>
+            <p>producto x cant-precio-precioiva</p>
+        <ul id="elementos-carrito">
+        </ul>
+        
+        <p>total de compra : <span id="total">0</span></p>
+        <button id="btn-comprar"> confirmar compra</button>
+        
         </div>
     </section>
     <script src="./JS/index.js"></script>
